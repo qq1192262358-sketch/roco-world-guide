@@ -24,6 +24,16 @@ function getPetImgUrl(name) {
   const mapped = IMG_NAME_MAP[name] || name;
   return `https://wiki.biligame.com/rocom/Special:FilePath/页面_宠物_立绘_${mapped}_1.png`;
 }
+// 异色形态图片 (_2)
+function getPetShinyUrl(name) {
+  const mapped = IMG_NAME_MAP[name] || name;
+  return `https://wiki.biligame.com/rocom/Special:FilePath/页面_宠物_立绘_${mapped}_2.png`;
+}
+// 炫彩形态图片 (_3)
+function getPetDazzleUrl(name) {
+  const mapped = IMG_NAME_MAP[name] || name;
+  return `https://wiki.biligame.com/rocom/Special:FilePath/页面_宠物_立绘_${mapped}_3.png`;
+}
 function petImgTag(name, size, fallbackEmoji, extraClass) {
   const cls = extraClass || '';
   return `<img class="pet-img ${cls}" src="${getPetImgUrl(name)}" alt="${name}" 
@@ -844,13 +854,13 @@ function openDexDetail(no) {
         </div>
         <div class="form-gallery-item" onclick="openFormModal(${pet.no},'shiny')">
           <div class="form-gallery-img form-gallery-shiny" style="background:linear-gradient(135deg,#fff8e0,#ffe0a0);">
-            ${petImgTag(pet.n, 80, tc.e, 'form-thumb pet-img-shiny')}
+            <img class="pet-img form-thumb" src="${getPetShinyUrl(pet.n)}" alt="${pet.n} 异色" style="width:80px;height:80px;object-fit:contain;border-radius:10px;" loading="lazy" onerror="this.style.display='none'">
           </div>
           <div class="form-gallery-label">${gIcon('starGold',12)} 异色</div>
         </div>
         <div class="form-gallery-item" onclick="openFormModal(${pet.no},'dazzle')">
           <div class="form-gallery-img form-gallery-dazzle" style="background:linear-gradient(135deg,#ffe0ef,#e0f0ff,#e8ffe0);">
-            ${petImgTag(pet.n, 80, tc.e, 'form-thumb pet-img-dazzle-thumb')}
+            <img class="pet-img form-thumb" src="${getPetDazzleUrl(pet.n)}" alt="${pet.n} 炫彩" style="width:80px;height:80px;object-fit:contain;border-radius:10px;" loading="lazy" onerror="this.style.display='none'">
             <div class="dazzle-overlay" style="border-radius:12px;"></div>
           </div>
           <div class="form-gallery-label">${gIcon('sparkPurple',12)} 炫彩</div>
@@ -926,6 +936,8 @@ function openFormModal(no, initForm) {
   if (!pet) return;
   const tc = petTC(pet);
   const imgUrl = getPetImgUrl(pet.n);
+  const shinyUrl = getPetShinyUrl(pet.n);
+  const dazzleUrl = getPetDazzleUrl(pet.n);
   
   // 移除已有modal
   const old = document.getElementById('formModal');
@@ -941,9 +953,9 @@ function openFormModal(no, initForm) {
     if (form === 'normal') {
       return `<img class="pet-img" src="${imgUrl}" alt="${pet.n}" style="width:${s}px;height:${s}px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" loading="lazy"><span class="pet-img-fallback" style="display:none;width:${s}px;height:${s}px;align-items:center;justify-content:center;font-size:${Math.round(s*0.5)}px;">${tc.e}</span>`;
     } else if (form === 'shiny') {
-      return `<div class="pet-img-shiny"><img class="pet-img" src="${imgUrl}" alt="${pet.n} 异色" style="width:${s}px;height:${s}px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" loading="lazy"><span class="pet-img-fallback" style="display:none;width:${s}px;height:${s}px;align-items:center;justify-content:center;font-size:${Math.round(s*0.5)}px;">${tc.e}</span></div>`;
+      return `<img class="pet-img" src="${shinyUrl}" alt="${pet.n} 异色" style="width:${s}px;height:${s}px;object-fit:contain;" onerror="this.src='${imgUrl}';this.classList.add('pet-img-shiny-fallback')" loading="lazy">`;
     } else {
-      return `<div class="pet-img-dazzle" style="position:relative;display:inline-block;"><img class="pet-img" src="${imgUrl}" alt="${pet.n} 炫彩" style="width:${s}px;height:${s}px;object-fit:contain;filter:saturate(1.6) brightness(1.1) contrast(1.05);" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" loading="lazy"><span class="pet-img-fallback" style="display:none;width:${s}px;height:${s}px;align-items:center;justify-content:center;font-size:${Math.round(s*0.5)}px;">${tc.e}</span><div class="dazzle-overlay" style="border-radius:12px;"></div><div class="dazzle-sparkle" style="border-radius:12px;"></div></div>`;
+      return `<div style="position:relative;display:inline-block;"><img class="pet-img" src="${dazzleUrl}" alt="${pet.n} 炫彩" style="width:${s}px;height:${s}px;object-fit:contain;" onerror="this.src='${imgUrl}';this.style.filter='saturate(1.6) brightness(1.1)'" loading="lazy"><div class="dazzle-overlay" style="border-radius:12px;"></div><div class="dazzle-sparkle" style="border-radius:12px;"></div></div>`;
     }
   };
   
@@ -955,25 +967,25 @@ function openFormModal(no, initForm) {
       </div>
       <div class="form-modal-body">
         <div class="form-modal-card form-modal-card-normal ${initForm==='normal'?'form-modal-card-active':''}">
-          <div class="form-modal-badge-row"><span class="form-modal-badge" style="background:#4a6cf7;color:#fff;">&#128218; 普通形态</span></div>
+          <div class="form-modal-badge-row"><span class="form-modal-badge" style="background:#4a6cf7;color:#fff;">${gIcon('dex',14)} 普通形态</span></div>
           <div class="form-modal-img-area" style="background:linear-gradient(135deg,${tc.bg},#fff);">
             ${imgBlock('normal', 140)}
           </div>
           <div class="form-modal-desc form-info-normal">精灵的原始外观配色，所有精灵默认形态。</div>
         </div>
         <div class="form-modal-card form-modal-card-shiny ${initForm==='shiny'?'form-modal-card-active':''}">
-          <div class="form-modal-badge-row"><span class="form-modal-badge" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;">&#10024; 异色形态</span><span class="form-prob form-prob-shiny">1.8%概率</span></div>
+          <div class="form-modal-badge-row"><span class="form-modal-badge" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;">${gIcon('starGold',14)} 异色形态</span><span class="form-prob form-prob-shiny">1.8%概率</span></div>
           <div class="form-modal-img-area" style="background:linear-gradient(135deg,#fff8e0,#ffe0a0);">
             ${imgBlock('shiny', 140)}
           </div>
-          <div class="form-modal-desc form-info-shiny">配色与普通版不同的稀有外观。<br>属性、技能、种族值完全一致。<br>&#128161; 野外捕捉1.8%概率，20次保底。</div>
+          <div class="form-modal-desc form-info-shiny">配色与普通版不同的稀有外观。<br>属性、技能、种族值完全一致。<br>${gIcon('questTale',12)} 野外捕捉1.8%概率，20次保底。</div>
         </div>
         <div class="form-modal-card form-modal-card-dazzle ${initForm==='dazzle'?'form-modal-card-active':''}">
-          <div class="form-modal-badge-row"><span class="form-modal-badge" style="background:linear-gradient(135deg,#e74c3c,#f1c40f,#3498db);color:#fff;">&#127752; 炫彩形态</span><span class="form-prob form-prob-dazzle">棱镜球专属</span></div>
+          <div class="form-modal-badge-row"><span class="form-modal-badge" style="background:linear-gradient(135deg,#e74c3c,#f1c40f,#3498db);color:#fff;">${gIcon('sparkPurple',14)} 炫彩形态</span><span class="form-prob form-prob-dazzle">棱镜球专属</span></div>
           <div class="form-modal-img-area" style="background:linear-gradient(135deg,#ffe0ef,#e0f0ff,#e8ffe0);">
             ${imgBlock('dazzle', 140)}
           </div>
-          <div class="form-modal-desc form-info-dazzle">棱镜球捕捉时触发五彩特效。<br>可与异色叠加获得双形态。<br>&#128161; 仅限棱镜球(100%捕捉+炫彩)。</div>
+          <div class="form-modal-desc form-info-dazzle">棱镜球捕捉时触发五彩特效。<br>可与异色叠加获得双形态。<br>${gIcon('questTale',12)} 仅限棱镜球(100%捕捉+炫彩)。</div>
         </div>
       </div>
     </div>`;
