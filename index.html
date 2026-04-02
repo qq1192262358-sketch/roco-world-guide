@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>洛克王国世界 - 全能攻略助手</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+<!-- 导航栏 -->
+<div class="navbar">
+  <div class="navbar-back" id="navBack" onclick="goBack()">&#8592;</div>
+  <div class="navbar-title" id="navTitle">全能攻略助手</div>
+</div>
+
+<!-- 首页：BOSS列表 -->
+<div class="page active" id="pageBoss">
+  <!-- 特殊攻略入口 -->
+  <div class="special-guide-grid">
+    <div class="sg-card sg-floral" onclick="openSpecialGuide('floralBoss')"><div class="sg-icon"><img src="https://patchwiki.biligame.com/images/rocom/f/f8/ifb5jnhil9kfur7px1yftlfah8zhcmt.png" style="width:28px;height:28px"></div><div class="sg-label">命定花种</div></div>
+    <div class="sg-card sg-beast" onclick="openSpecialGuide('rareBeast')"><div class="sg-icon"><img src="https://patchwiki.biligame.com/images/rocom/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png" style="width:28px;height:28px"></div><div class="sg-label">稀兽挑战</div></div>
+    <div class="sg-card sg-chief" onclick="openSpecialGuide('chieftain')"><div class="sg-icon"><img src="https://patchwiki.biligame.com/images/rocom/1/13/o5evcztzo2vp80qd8qt70m2csme2ami.png" style="width:28px;height:28px"></div><div class="sg-label">精灵首领</div></div>
+    <div class="sg-card sg-legend" onclick="openSpecialGuide('legendary')"><div class="sg-icon"><img src="https://patchwiki.biligame.com/images/rocom/8/8c/7qsncvokm4oj6mrqybvz9y6m67i27mt.png" style="width:28px;height:28px"></div><div class="sg-label">传说精灵</div></div>
+  </div>
+  <div class="search-bar">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" placeholder="搜索BOSS名称、属性、位置..." id="searchInput" oninput="filterBoss()">
+  </div>
+  <div class="category-tabs" id="categoryTabs"></div>
+  <div id="bossList"></div>
+</div>
+
+<!-- BOSS详情页 -->
+<div class="detail-page" id="pageDetail"></div>
+
+<!-- 特殊攻略详情页 -->
+<div class="detail-page" id="pageSpecialGuide"></div>
+
+<!-- 精灵图鉴页 -->
+<div class="page" id="pageDex">
+  <div style="font-size:16px;font-weight:700;color:#2c3e50;margin-bottom:4px;display:flex;align-items:center;gap:6px"><img src="https://patchwiki.biligame.com/images/rocom/3/3c/imw150a0agztfv9p59gkq5ds4e3yyh9.png" style="width:22px;height:22px"> 精灵图鉴 <span style="font-size:12px;color:#999;font-weight:400;" id="dexTotalCount">(347只)</span></div>
+  
+  <!-- 快捷工具栏 -->
+  <div class="dex-tools-grid">
+    <div class="dex-tool-btn" onclick="openDexSubpage('type')"><span class="dex-tool-icon"><img src="https://patchwiki.biligame.com/images/rocom/2/22/iazf7tgi59w00bctm7o7xugenug7byw.png" style="width:22px;height:22px"></span><span class="dex-tool-label">属性克制</span></div>
+    <div class="dex-tool-btn" onclick="openDexSubpage('skills')"><span class="dex-tool-icon"><img src="https://patchwiki.biligame.com/images/rocom/9/97/3smp6ncwfp80ojpejrwgfymuty9al7e.png" style="width:22px;height:22px"></span><span class="dex-tool-label">技能图鉴</span></div>
+    <div class="dex-tool-btn" onclick="openDexSubpage('eggs')"><span class="dex-tool-icon"><img src="https://patchwiki.biligame.com/images/rocom/5/50/917ct1jht5zjf6d6ftyfgwaqbqmi4u6.png" style="width:22px;height:22px"></span><span class="dex-tool-label">精灵蛋</span></div>
+    <div class="dex-tool-btn" onclick="openDexSubpage('balls')"><span class="dex-tool-icon"><img src="https://patchwiki.biligame.com/images/rocom/1/12/dcufmhvntrbt2dfdgnymvpegodeb96q.png" style="width:22px;height:22px"></span><span class="dex-tool-label">咕噜球</span></div>
+    <div class="dex-tool-btn" onclick="openDexSubpage('guide')"><span class="dex-tool-icon"><img src="https://patchwiki.biligame.com/images/rocom/6/66/aybvnyggb92rm0b0id9unlcai02wv5x.png" style="width:22px;height:22px"></span><span class="dex-tool-label">玩法指南</span></div>
+  </div>
+  
+  <!-- 搜索 -->
+  <div class="search-bar" style="margin-bottom:8px;">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" placeholder="搜索精灵名/属性/技能/特性..." id="dexSearch" oninput="debounceDexSearch()">
+  </div>
+  
+  <!-- 进化阶段筛选 -->
+  <div class="dex-evo-tabs" id="dexEvoTabs">
+    <div class="dex-evo-tab active" onclick="selectDexEvo('all',this)">全部</div>
+    <div class="dex-evo-tab" onclick="selectDexEvo('final',this)">&#11088; 最终形态</div>
+    <div class="dex-evo-tab" onclick="selectDexEvo('stage1',this)">&#8544;阶</div>
+    <div class="dex-evo-tab" onclick="selectDexEvo('stage2',this)">&#8545;阶</div>
+    <div class="dex-evo-tab" onclick="selectDexEvo('noevo',this)">不可进化</div>
+  </div>
+  
+  <!-- 属性筛选 -->
+  <div class="dex-type-grid" id="dexTypeTabs"></div>
+  
+  <!-- 计数+视图切换 -->
+  <div class="dex-list-toolbar">
+    <span class="dex-count-text" id="dexCount"></span>
+    <div class="dex-view-btns">
+      <span class="dex-view-btn active" id="dexViewCard" onclick="switchDexView('card')" title="卡片视图">&#9783;</span>
+      <span class="dex-view-btn" id="dexViewTable" onclick="switchDexView('table')" title="表格视图">&#9776;</span>
+    </div>
+  </div>
+  
+  <div id="dexList"></div>
+</div>
+
+<!-- 精灵详情页 -->
+<div class="detail-page" id="pageDexDetail"></div>
+
+<!-- 属性克制二级页 -->
+<div class="detail-page" id="pageDexType">
+  <div style="font-size:16px;font-weight:700;color:#2c3e50;margin-bottom:4px;display:flex;align-items:center;gap:6px"><img src="https://patchwiki.biligame.com/images/rocom/2/22/iazf7tgi59w00bctm7o7xugenug7byw.png" style="width:22px;height:22px"> 属性克制查询</div>
+  <div style="font-size:12px;color:#999;margin-bottom:14px;">18种属性完整克制关系 | 克制2x 抵抗0.5x</div>
+  <div class="type-grid" id="typeGrid"></div>
+  <div class="type-result" id="typeResult"></div>
+</div>
+
+<!-- 基础玩法二级页 -->
+<div class="detail-page" id="pageDexGuide">
+  <div style="font-size:16px;font-weight:700;color:#2c3e50;margin-bottom:4px;display:flex;align-items:center;gap:6px"><img src="https://patchwiki.biligame.com/images/rocom/6/66/aybvnyggb92rm0b0id9unlcai02wv5x.png" style="width:22px;height:22px"> 基础玩法指南</div>
+  <div style="font-size:12px;color:#999;margin-bottom:14px;">从萌新到大师的必备知识</div>
+  <div id="guideList"></div>
+</div>
+
+<!-- 技能图鉴二级页 -->
+<div class="detail-page" id="pageDexSkills">
+  <div style="font-size:16px;font-weight:700;color:#2c3e50;margin-bottom:4px;display:flex;align-items:center;gap:6px"><img src="https://patchwiki.biligame.com/images/rocom/9/97/3smp6ncwfp80ojpejrwgfymuty9al7e.png" style="width:22px;height:22px"> 技能图鉴</div>
+  <div style="font-size:12px;color:#999;margin-bottom:10px;">全部技能检索 | 按类型/属性筛选</div>
+  <div class="search-bar" style="margin-bottom:8px;">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" placeholder="搜索技能名或效果..." id="skillDexSearch" oninput="debounceSkillSearch()">
+  </div>
+  <!-- 技能类型筛选 -->
+  <div class="skill-filter-row">
+    <span class="skill-filter-label">类型</span>
+    <div class="skill-filter-tags" id="skillTypeFilter"></div>
+  </div>
+  <!-- 技能属性筛选 -->
+  <div class="skill-filter-row">
+    <span class="skill-filter-label">属性</span>
+    <div class="skill-filter-tags" id="skillAttrFilter"></div>
+  </div>
+  <div style="font-size:11px;color:#999;margin-bottom:8px;" id="skillDexCount"></div>
+  <div id="skillDexList"></div>
+</div>
+
+<!-- 精灵蛋攻略子页 -->
+<div class="detail-page" id="pageDexEggs"></div>
+
+<!-- 咕噜球图鉴子页 -->
+<div class="detail-page" id="pageDexBalls"></div>
+
+<!-- 阵容页（推荐+战力合并） -->
+<div class="page" id="pageTeam">
+  <!-- 内部子Tab -->
+  <div class="team-sub-tabs">
+    <div class="team-sub-tab active" onclick="switchTeamSub('rec',this)"><img src="https://patchwiki.biligame.com/images/rocom/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png" style="width:16px;height:16px;vertical-align:middle"> 阵容推荐</div>
+    <div class="team-sub-tab" onclick="switchTeamSub('analyze',this)"><img src="https://patchwiki.biligame.com/images/rocom/2/22/iazf7tgi59w00bctm7o7xugenug7byw.png" style="width:16px;height:16px;vertical-align:middle"> 战力分析</div>
+  </div>
+
+  <!-- 子页：推荐 -->
+  <div class="team-sub-page active" id="teamSubRec">
+    <div style="font-size:12px;color:#999;margin-bottom:10px;">S1赛季完整阵容搭配 · 每类10+套 · 按强度排列</div>
+    <div class="pet-team-search">
+      <div class="pet-team-search-title">&#128269; 查找包含指定精灵的阵容</div>
+      <div class="pet-team-search-bar">
+        <input type="text" placeholder="输入精灵名（如: 嘟嘟锅、火神）..." id="petTeamSearch" oninput="searchTeamByPetInput()">
+      </div>
+      <div class="pet-team-hot" id="petTeamHot"></div>
+      <div id="petTeamResult"></div>
+    </div>
+    <div class="team-cat-tabs" id="teamCatTabs"></div>
+    <div id="teamList"></div>
+  </div>
+
+  <!-- 子页：战力分析 -->
+  <div class="team-sub-page" id="teamSubAnalyze">
+    <div style="font-size:12px;color:#999;margin-bottom:14px;">自由搭配精灵阵容 · AI智能分析战力评级</div>
+    <div class="az-team-slots" id="azTeamSlots"></div>
+    <div class="az-add-btn" onclick="openPetPicker()" id="azAddBtn">
+      <span style="font-size:22px">&#10133;</span>
+      <span>添加精灵 (最多6只)</span>
+    </div>
+    <div class="az-analyze-btn" id="azAnalyzeBtn" onclick="runAnalysis()">
+      <span>&#9889; 开始分析战力</span>
+    </div>
+    <div id="azResult"></div>
+  </div>
+</div>
+
+<!-- 活动日历页 -->
+<div class="page" id="pageEvent">
+  <div style="font-size:16px;font-weight:700;color:#2c3e50;margin-bottom:4px;display:flex;align-items:center;gap:6px"><img src="https://patchwiki.biligame.com/images/rocom/5/5d/6d3nztcz0tcecbz3wdy9iu51ylyr8t3.png" style="width:22px;height:22px"> 开服庆典活动</div>
+  <div style="font-size:12px;color:#999;margin-bottom:14px;">3.26 - 5.24 活动时间表</div>
+  <div id="eventList"></div>
+</div>
+
+<!-- 精灵选择弹窗 -->
+<div class="az-picker-overlay" id="azPickerOverlay" onclick="if(event.target===this)closePetPicker()">
+  <div class="az-picker-panel">
+    <div class="az-picker-header">
+      <span class="az-picker-title">选择精灵</span>
+      <span class="az-picker-close" onclick="closePetPicker()">&#10005;</span>
+    </div>
+    <div class="az-picker-search">
+      <span>&#128269;</span>
+      <input type="text" placeholder="搜索精灵名称..." id="azPetSearch" oninput="renderPickerList()">
+    </div>
+    <div class="az-picker-type-tabs" id="azPickerTypeTabs"></div>
+    <div class="az-picker-list" id="azPickerList"></div>
+  </div>
+</div>
+
+<!-- 地图页 -->
+<div class="page" id="pageMap">
+  <div style="font-size:16px;font-weight:700;color:#2c3e50;margin-bottom:4px;display:flex;align-items:center;gap:6px"><img src="https://patchwiki.biligame.com/images/rocom/8/8f/gf4gxtq1rrxe7ue7rba6jhdb1xndc1x.png" style="width:22px;height:22px"> 世界地图</div>
+  <div style="font-size:12px;color:#999;margin-bottom:8px;">全标注交互地图 · 图层控制 · 收藏追踪 · 进度管理</div>
+  
+  <!-- 搜索栏 -->
+  <div class="map-search-bar">
+    <span><img src="https://patchwiki.biligame.com/images/rocom/d/df/mebtr92zdlbvmpx8ujhlmqcom9lpg6n.png" style="width:16px;height:16px"></span>
+    <input type="text" placeholder="搜索NPC、精灵、任务、BOSS..." id="mapSearch" oninput="debounceMapSearch()">
+    <span class="map-search-clear" id="mapSearchClear" onclick="clearMapSearch()" style="display:none">✕</span>
+  </div>
+  
+  <!-- 工具栏（统计+快捷操作） -->
+  <div class="map-toolbar" id="mapToolbar"></div>
+  
+  <!-- 多图层开关面板 -->
+  <div class="map-filter-tabs" id="mapFilterTabs"></div>
+  
+  <!-- 搜索结果列表 -->
+  <div id="mapSearchResults"></div>
+  
+  <!-- 地图画布（Leaflet交互式） -->
+  <div id="mapContainer" style="width:100%;height:420px;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08);margin-bottom:8px;z-index:1;position:relative;">
+    <div id="mapViewStats" style="position:absolute;top:8px;right:8px;z-index:1000;background:rgba(0,0,0,.6);color:#fff;padding:3px 10px;border-radius:8px;font-size:10px;pointer-events:none"></div>
+  </div>
+  
+  <!-- 标记详情弹窗 -->
+  <div class="map-detail" id="mapDetail"></div>
+  
+  <!-- 区域列表 -->
+  <div class="map-zone-list" id="mapZoneList"></div>
+</div>
+
+<!-- 底部TabBar（5个Tab - 游戏内图标） -->
+<div class="tabbar">
+  <div class="tab-item active" onclick="switchTab('boss',this)">
+    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/2/20/8bx4ds1o59x3ixcjyxuc68po9aywmd0.png" style="width:22px;height:22px"></span>
+    <span class="tab-label">BOSS</span>
+  </div>
+  <div class="tab-item" onclick="switchTab('dex',this)">
+    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/3/3c/imw150a0agztfv9p59gkq5ds4e3yyh9.png" style="width:22px;height:22px"></span>
+    <span class="tab-label">图鉴</span>
+  </div>
+  <div class="tab-item" onclick="switchTab('map',this)">
+    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/8/8f/gf4gxtq1rrxe7ue7rba6jhdb1xndc1x.png" style="width:22px;height:22px"></span>
+    <span class="tab-label">地图</span>
+  </div>
+  <div class="tab-item" onclick="switchTab('team',this)">
+    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png" style="width:22px;height:22px"></span>
+    <span class="tab-label">阵容</span>
+  </div>
+  <div class="tab-item" onclick="switchTab('event',this)">
+    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/5/5d/6d3nztcz0tcecbz3wdy9iu51ylyr8t3.png" style="width:22px;height:22px"></span>
+    <span class="tab-label">活动</span>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="dex-data.js"></script>
+<script src="pet-skills.js"></script>
+<script src="team-data.js"></script>
+<script src="map-data.js"></script>
+<script src="egg-data.js"></script>
+<script src="ball-data.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="map-engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
