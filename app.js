@@ -34,24 +34,24 @@ function petImgTag(name, size, fallbackEmoji, extraClass) {
 
 // ================ 游戏内图标资源 ================
 const ROCOM_BASE = 'https://rocom.game-walkthrough.com';
-// 属性图标（游戏内UI）
+// 属性图标（腾讯官方CDN game.gtimg.cn）
 const ATTR_ICON_MAP = {
-  "普通系":"putong","草系":"cao","火系":"huo","水系":"shui","光系":"guang",
-  "地系":"di","冰系":"bing","龙系":"long","电系":"dian","毒系":"du",
-  "虫系":"chong","武系":"wu","翼系":"yi","萌系":"meng","幽系":"you",
-  "恶系":"e","机械系":"jixie","幻系":"huan"
+  "普通系":"icon-type-17","草系":"icon-type-6","火系":"icon-type-3","水系":"icon-type-2","光系":"icon-type-10",
+  "地系":"icon-type-16","冰系":"icon-type-7","龙系":"icon-type-11","电系":"icon-type-4","毒系":"icon-type-15",
+  "虫系":"icon-type-9","武系":"icon-type-13","翼系":"icon-type-5","萌系":"icon-type-8","幽系":"icon-type-18",
+  "恶系":"icon-type-14","机械系":"icon-type-12","幻系":"icon-type-19"
 };
 function getAttrIconUrl(typeName) {
-  const key = ATTR_ICON_MAP[typeName] || 'putong';
-  return `${ROCOM_BASE}/attrs/${key}.webp`;
+  const key = ATTR_ICON_MAP[typeName] || 'icon-type-17';
+  return `https://game.gtimg.cn/images/rocom/web202504/index/part2/${key}.png`;
 }
 function attrIconTag(typeName, size) {
   const s = size || 18;
   return `<img src="${getAttrIconUrl(typeName)}" alt="${typeName}" style="width:${s}px;height:${s}px;vertical-align:middle;border-radius:50%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'">`;
 }
-// 技能图标（游戏内UI，128x128 PNG）
+// 技能图标（BiliWiki游戏内图标，554+个）
 function getSkillIconUrl(skillName) {
-  return `${ROCOM_BASE}/skills/${encodeURIComponent(skillName)}.png`;
+  return `https://wiki.biligame.com/rocom/Special:FilePath/${encodeURIComponent('技能图标_' + skillName)}.png`;
 }
 function skillIconTag(skillName, size) {
   const s = size || 32;
@@ -157,22 +157,28 @@ const TYPE_COLORS = {
 };
 
 // ================ 技能类型图标(SVG) ================
+// 技能分类图标 (使用BiliWiki游戏内技能图标作为代表)
+const BWIKI_SKILL = 'https://wiki.biligame.com/rocom/Special:FilePath/';
+function skillCatIcon(name, size) {
+  const s = size || 20;
+  return `<img src="${BWIKI_SKILL}${encodeURIComponent('技能图标_' + name)}.png" style="width:${s}px;height:${s}px;object-fit:contain;border-radius:4px" loading="lazy" onerror="this.style.display='none'">`;
+}
 const SKILL_CAT = {
   "物": {
     bg:"#fff0ef", c:"#e74c3c", label:"物攻",
-    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 3L16.5 5L12.5 9L14.5 11L20.5 5L22 6.5L16 12.5L14 10.5L10 14.5L12 16.5L6 22.5L2 22L1.5 18L7.5 12L9.5 14L13.5 10L11.5 8L14.5 3Z" fill="#e74c3c"/></svg>`
+    svg: skillCatIcon("崩拳", 20)
   },
   "魔": {
     bg:"#f0e6ff", c:"#9b59b6", label:"魔攻",
-    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L14.4 8.4L21 9.6L16.2 14.4L17.4 21L12 17.8L6.6 21L7.8 14.4L3 9.6L9.6 8.4L12 2Z" fill="#9b59b6"/><circle cx="12" cy="12" r="3" fill="#f0e6ff"/></svg>`
+    svg: skillCatIcon("天火", 20)
   },
   "防": {
     bg:"#e8f8f0", c:"#27ae60", label:"防御",
-    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L4 6V12C4 17 7.4 21.4 12 22.8C16.6 21.4 20 17 20 12V6L12 2Z" fill="#27ae60"/><path d="M12 5L7 8V12C7 15.5 9.2 18.7 12 19.8C14.8 18.7 17 15.5 17 12V8L12 5Z" fill="#e8f8f0"/><path d="M10.5 14L8.5 12L9.9 10.6L10.5 11.2L14.1 7.6L15.5 9L10.5 14Z" fill="#27ae60"/></svg>`
+    svg: skillCatIcon("冰墙", 20)
   },
   "状": {
     bg:"#eef5ff", c:"#3498db", label:"状态",
-    svg:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="#3498db"/><path d="M12 6V12L16 14" stroke="#eef5ff" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="#eef5ff"/></svg>`
+    svg: skillCatIcon("闪避", 20)
   }
 };
 
@@ -2004,13 +2010,14 @@ function renderSkillDexCard(entry) {
   const skAttr = guessSkillAttr(entry);
   const attrTc = TYPE_COLORS[skAttr] || TYPE_COLORS["普通系"];
   const petList = entry.pets.slice(0, 5).join(', ') + (entry.pets.length > 5 ? ` 等${entry.pets.length}只` : '');
+  const skillImgUrl = BWIKI_SKILL + encodeURIComponent('技能图标_' + sk.n) + '.png';
   return `<div class="skill-dex-card">
-    <div class="skill-dex-icon" style="background:${cc.bg}">${cc.svg}</div>
+    <div class="skill-dex-icon" style="background:${cc.bg}"><img src="${skillImgUrl}" style="width:32px;height:32px;object-fit:contain;border-radius:6px" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='${cc.svg.replace(/'/g, "\\'")}'"></div>
     <div class="skill-dex-info">
-      <div class="skill-dex-name">${sk.n} <span class="skill-dex-type-tag" style="background:${cc.bg};color:${cc.c}">${cc.label}</span> <span style="display:inline-flex;align-items:center;gap:1px;padding:1px 4px;border-radius:3px;font-size:9px;background:${attrTc.bg};color:${attrTc.c}">${attrIconTag(skAttr,10)}${skAttr.replace('系','')}</span></div>
+      <div class="skill-dex-name">${sk.n} <span class="skill-dex-type-tag" style="background:${cc.bg};color:${cc.c}">${cc.svg} ${cc.label}</span> <span style="display:inline-flex;align-items:center;gap:1px;padding:1px 4px;border-radius:3px;font-size:9px;background:${attrTc.bg};color:${attrTc.c}">${attrIconTag(skAttr,10)}${skAttr.replace('系','')}</span></div>
       <div class="skill-dex-meta">${sk.w > 0 ? `<span class="skill-dex-power">威力 ${sk.w}</span>` : ''}${sk.c > 0 ? `<span style="font-size:10px;color:#888">能耗 ${sk.c}</span>` : ''}</div>
       ${sk.d ? `<div class="skill-dex-desc">${sk.d}</div>` : ''}
-      <div class="skill-dex-pets">&#128062; ${petList}</div>
+      <div class="skill-dex-pets">${gIcon('fruit',10)} ${petList}</div>
     </div>
   </div>`;
 }
