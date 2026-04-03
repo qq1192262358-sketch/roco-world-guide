@@ -7,7 +7,7 @@ let allMapMarkerObjs = [];
 
 // 图层可见性（多选，localStorage持久化）
 let layerVisibility = {};
-const LAYER_TYPES = ['pet','boss','chest','gather','collect','npc','quest','shop','teleport','dungeon','battle','facility','hidden'];
+const LAYER_TYPES = ['pet','boss','chest','gather','collect','npc','quest','shop','teleport','dungeon','battle','facility','hidden','magicfruit'];
 
 // 收藏/已完成系统（localStorage持久化）
 let markedDone = {}; // { markerId: true }
@@ -15,17 +15,28 @@ let bookmarks = {};  // { markerId: true }
 
 // ================ 瓦片底图 ================
 const TILE_BASE = 'https://wiki-dev-patch-oss.oss-cn-hangzhou.aliyuncs.com/res/lkwg/map-3.0';
+// BiliWiki用CRS.Simple + 自定义瓦片坐标（中心为0,0）
 const GameTileLayer = L.TileLayer.extend({
   getTileUrl: function(coords) {
     const z = coords.z;
+    // CRS.Simple下Leaflet的瓦片坐标从左上角(0,0)开始
+    // BiliWiki瓦片以中心为原点，需要减去half偏移
     const half = Math.pow(2, z) / 2;
-    return `${TILE_BASE}/${z}/tile-${coords.x - half}_${coords.y - half}.png`;
+    const x = coords.x - half;
+    const y = coords.y - half;
+    return `${TILE_BASE}/${z}/tile-${x}_${y}.png`;
   }
 });
 
-// ================ 坐标转换 ================
+// ================ 坐标：直接使用BiliWiki CRS.Simple坐标 ================
+// BiliWiki坐标系：lat(-2100~2100), lng(-3000~2800)，CRS.Simple像素坐标
+// map-data.js中的标记直接用 lat/lng 字段（BiliWiki坐标）
 function markerToLatLng(m) {
-  return [80 - (m.y / 700) * 160, -150 + (m.x / 1000) * 300];
+  // 直接使用lat/lng字段（BiliWiki CRS.Simple坐标）
+  if (m.lat !== undefined && m.lng !== undefined) return [m.lat, m.lng];
+  // 兼容旧数据（x,y是Canvas坐标0-1000）- 转换到BiliWiki坐标系
+  // 旧x(0~1000)→lng(-2800~2800), 旧y(0~1000)→lat(2000~-2000)
+  return [2000 - (m.y / 1000) * 4000, -2800 + (m.x / 1000) * 5600];
 }
 
 // ================ 初始化 ================
@@ -65,14 +76,15 @@ function initLeafletMap() {
   const container = document.getElementById('mapContainer');
   if (!container) return;
   leafletMap = L.map(container, {
-    center: [0, 0], zoom: 5, minZoom: 4, maxZoom: 8,
+    crs: L.CRS.Simple,
+    center: [0, 0], zoom: 5, minZoom: 3, maxZoom: 8,
     zoomControl: false, attributionControl: false,
     zoomSnap: 0.5, zoomDelta: 0.5
   });
   // 缩放控件放右下角
   L.control.zoom({ position: 'bottomright' }).addTo(leafletMap);
   // 瓦片底图
-  new GameTileLayer('', { minZoom: 4, maxZoom: 8, tileSize: 256, noWrap: true }).addTo(leafletMap);
+  new GameTileLayer('', { minZoom: 3, maxZoom: 8, tileSize: 256, noWrap: true }).addTo(leafletMap);
   // 标记图层
   markerLayer = L.layerGroup().addTo(leafletMap);
   // 坐标显示控件
