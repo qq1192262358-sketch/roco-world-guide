@@ -2,18 +2,35 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>洛克王国世界 - 全能攻略助手</title>
+<link rel="icon" href="https://patchwiki.biligame.com/images/rocom/3/3c/imw150a0agztfv9p59gkq5ds4e3yyh9.png" type="image/png">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
 
-<!-- 导航栏 -->
-<div class="navbar">
-  <div class="navbar-back" id="navBack" onclick="goBack()">&#8592;</div>
-  <div class="navbar-title" id="navTitle">全能攻略助手</div>
-</div>
+<!-- 顶部导航栏（网页版） -->
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="site-logo">
+      <img src="https://patchwiki.biligame.com/images/rocom/3/3c/imw150a0agztfv9p59gkq5ds4e3yyh9.png" style="width:28px;height:28px">
+      <span class="site-logo-text">洛克王国世界攻略</span>
+    </div>
+    <nav class="site-nav" id="siteNav">
+      <a class="nav-item active" onclick="switchTab('boss',this)" data-tab="boss"><img src="https://patchwiki.biligame.com/images/rocom/2/20/8bx4ds1o59x3ixcjyxuc68po9aywmd0.png" style="width:18px;height:18px"> BOSS</a>
+      <a class="nav-item" onclick="switchTab('dex',this)" data-tab="dex"><img src="https://patchwiki.biligame.com/images/rocom/3/3c/imw150a0agztfv9p59gkq5ds4e3yyh9.png" style="width:18px;height:18px"> 图鉴</a>
+      <a class="nav-item" onclick="switchTab('map',this)" data-tab="map"><img src="https://patchwiki.biligame.com/images/rocom/8/8f/gf4gxtq1rrxe7ue7rba6jhdb1xndc1x.png" style="width:18px;height:18px"> 地图</a>
+      <a class="nav-item" onclick="switchTab('team',this)" data-tab="team"><img src="https://patchwiki.biligame.com/images/rocom/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png" style="width:18px;height:18px"> 阵容</a>
+      <a class="nav-item" onclick="switchTab('event',this)" data-tab="event"><img src="https://patchwiki.biligame.com/images/rocom/5/5d/6d3nztcz0tcecbz3wdy9iu51ylyr8t3.png" style="width:18px;height:18px"> 活动</a>
+    </nav>
+    <div class="site-header-right">
+      <div class="nav-back-btn" id="navBack" onclick="goBack()">← 返回</div>
+      <span id="navTitle"></span>
+    </div>
+  </div>
+</header>
+<div class="site-main">
 
 <!-- 首页：BOSS列表 -->
 <div class="page active" id="pageBoss">
@@ -221,29 +238,7 @@
   <div class="map-zone-list" id="mapZoneList"></div>
 </div>
 
-<!-- 底部TabBar（5个Tab - 游戏内图标） -->
-<div class="tabbar">
-  <div class="tab-item active" onclick="switchTab('boss',this)">
-    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/2/20/8bx4ds1o59x3ixcjyxuc68po9aywmd0.png" style="width:22px;height:22px"></span>
-    <span class="tab-label">BOSS</span>
-  </div>
-  <div class="tab-item" onclick="switchTab('dex',this)">
-    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/3/3c/imw150a0agztfv9p59gkq5ds4e3yyh9.png" style="width:22px;height:22px"></span>
-    <span class="tab-label">图鉴</span>
-  </div>
-  <div class="tab-item" onclick="switchTab('map',this)">
-    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/8/8f/gf4gxtq1rrxe7ue7rba6jhdb1xndc1x.png" style="width:22px;height:22px"></span>
-    <span class="tab-label">地图</span>
-  </div>
-  <div class="tab-item" onclick="switchTab('team',this)">
-    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png" style="width:22px;height:22px"></span>
-    <span class="tab-label">阵容</span>
-  </div>
-  <div class="tab-item" onclick="switchTab('event',this)">
-    <span class="tab-icon"><img src="https://patchwiki.biligame.com/images/rocom/5/5d/6d3nztcz0tcecbz3wdy9iu51ylyr8t3.png" style="width:22px;height:22px"></span>
-    <span class="tab-label">活动</span>
-  </div>
-</div>
+</div><!-- /site-main -->
 
 <script src="data.js"></script>
 <script src="dex-data.js"></script>
