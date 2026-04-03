@@ -269,16 +269,28 @@ document.addEventListener('DOMContentLoaded', () => {
 // ================ Tab切换 ================
 function switchTab(tab, el) {
   currentTab = tab;
+  // 更新顶部导航高亮
+  document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  // 兼容旧tabbar
   document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+  
   document.querySelectorAll('.page,.detail-page').forEach(p => p.classList.remove('active'));
   
   const pageMap = { boss:'pageBoss', dex:'pageDex', team:'pageTeam', event:'pageEvent', map:'pageMap' };
   document.getElementById(pageMap[tab]).classList.add('active');
-  document.getElementById('navBack').classList.remove('show');
+  
+  // 隐藏返回按钮
+  const backBtn = document.getElementById('navBack');
+  if (backBtn) backBtn.style.display = 'none';
+  
   const titles = { boss:'BOSS攻略', dex:'精灵图鉴', team:'阵容', event:'活动日历', map:'世界地图' };
-  document.getElementById('navTitle').textContent = titles[tab] || '全能攻略助手';
-  document.querySelector('.tabbar').style.display = 'flex';
+  document.getElementById('navTitle').textContent = titles[tab] || '';
+  
+  // 隐藏旧tabbar（如果存在）
+  const tabbar = document.querySelector('.tabbar');
+  if (tabbar) tabbar.style.display = 'none';
+  
   // 懒初始化
   if (!_tabInited[tab]) {
     _tabInited[tab] = true;
@@ -303,8 +315,8 @@ let dexSubpage = null; // 'type' | 'guide' | null
 function openDexSubpage(sub) {
   dexSubpage = sub;
   document.querySelectorAll('.page,.detail-page').forEach(p => p.classList.remove('active'));
-  document.getElementById('navBack').classList.add('show');
-  document.querySelector('.tabbar').style.display = 'none';
+  document.getElementById('navBack').style.display='inline-flex';
+  /* tabbar hidden in web layout */;
   if (sub === 'type') {
     if (!_tabInited.type) { _tabInited.type = true; renderTypeGrid(); }
     document.getElementById('pageDexType').classList.add('active');
@@ -352,8 +364,11 @@ function goBack() {
     document.getElementById('navTitle').textContent = 'BOSS攻略';
   }
   dexSubpage = null;
-  document.getElementById('navBack').classList.remove('show');
-  document.querySelector('.tabbar').style.display = 'flex';
+  const backBtn = document.getElementById('navBack');
+  if (backBtn) backBtn.style.display = 'none';
+  // 兼容旧tabbar
+  const tabbar = document.querySelector('.tabbar');
+  if (tabbar) tabbar.style.display = 'none';
 }
 
 // ================ 分类标签 ================
@@ -416,9 +431,9 @@ function openBossDetail(id) {
   if (!boss) return;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const detail = document.getElementById('pageDetail');
-  document.getElementById('navBack').classList.add('show');
+  document.getElementById('navBack').style.display='inline-flex';
   document.getElementById('navTitle').textContent = boss.name;
-  document.querySelector('.tabbar').style.display = 'none';
+  /* tabbar hidden in web layout */;
   const stars = Array.from({length:5}, (_, i) => `<span style="font-size:14px">${i < boss.difficulty ? '&#9733;' : '&#9734;'}</span>`).join('');
   // 从方案中提取精灵名（去掉等级括号等修饰）
   function extractPetName(petStr) {
@@ -800,9 +815,9 @@ function openDexDetail(no) {
   if (!pet) return;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const detail = document.getElementById('pageDexDetail');
-  document.getElementById('navBack').classList.add('show');
+  document.getElementById('navBack').style.display='inline-flex';
   document.getElementById('navTitle').textContent = pet.n;
-  document.querySelector('.tabbar').style.display = 'none';
+  /* tabbar hidden in web layout */;
   
   const tc = petTC(pet);
   const stars = Array.from({length:5}, (_, i) => `<span style="font-size:16px;color:${i<pet.s?'#f1c40f':'#ddd'}">${i<pet.s?'&#9733;':'&#9734;'}</span>`).join('');
@@ -2076,8 +2091,8 @@ function openSpecialGuide(type) {
   if (!data) return;
 
   document.querySelectorAll('.page,.detail-page').forEach(p => p.classList.remove('active'));
-  document.getElementById('navBack').classList.add('show');
-  document.querySelector('.tabbar').style.display = 'none';
+  document.getElementById('navBack').style.display='inline-flex';
+  /* tabbar hidden in web layout */;
   document.getElementById('navTitle').textContent = data.title;
 
   const detail = document.getElementById('pageSpecialGuide');
