@@ -29,24 +29,23 @@ const GameTileLayer = L.TileLayer.extend({
 });
 
 // ================ 坐标转换：BiliWiki像素坐标 → 标准Leaflet经纬度 ================
-// BiliWiki CRS.Simple 坐标范围: lat(-2100~2100), lng(-3000~2800)
-// 标准Leaflet(Mercator) 在zoom=5时，地图中心附近经纬度线性近似
-// 瓦片在zoom=5覆盖约 lat(-33~33), lng(-34~34)（根据实际测试tile--3到tile2的6个瓦片）
-// 比例: BiliWiki_lat / 2100 ≈ Leaflet_lat / 33 → scale = 33/2100 ≈ 0.0157
-// 但BiliWiki的lat轴是向上为正（y轴翻转），Leaflet的lat也是向上为正 → 不需要翻转
-const BWIKI_TO_LL_SCALE_LAT = 30 / 2100;  // BiliWiki lat → Leaflet lat
-const BWIKI_TO_LL_SCALE_LNG = 34 / 2800;  // BiliWiki lng → Leaflet lng
+// BiliWiki用CRS.Simple，1坐标单位=1像素，1瓦片=256像素
+// 标准Leaflet(Mercator)在zoom=5时，1瓦片=11.25度(360/32)
+// 因此: 1 BiliWiki单位 = 11.25/256 ≈ 0.04395度
+// 但BiliWiki的lat轴是y像素坐标(向下为正)，Leaflet的lat是向上为正 → 需要翻转lat
+const BWIKI_SCALE = 11.25 / 256; // = 0.043945
 
 function markerToLatLng(m) {
   // 优先使用BiliWiki坐标(lat/lng字段)
   if (m.lat !== undefined && m.lng !== undefined) {
-    return [m.lat * BWIKI_TO_LL_SCALE_LAT, m.lng * BWIKI_TO_LL_SCALE_LNG];
+    // BiliWiki的lat是像素y坐标，向下为正；Leaflet的lat向上为正 → 翻转
+    return [-m.lat * BWIKI_SCALE, m.lng * BWIKI_SCALE];
   }
   // 兼容旧Canvas坐标(x,y: 0-1000)
-  // 旧坐标映射: x(0~1000)→BiliWiki lng(-2800~2800), y(0~1000)→BiliWiki lat(2100~-2100)
-  const bwLat = 2100 - (m.y / 1000) * 4200;
+  // 旧坐标映射: x(0~1000)→BiliWiki lng(-2800~2800), y(0~1000)→BiliWiki lat(-2100~2100)
+  const bwLat = -2100 + (m.y / 1000) * 4200; // y=0→BiliWiki lat=-2100(上), y=1000→lat=2100(下)
   const bwLng = -2800 + (m.x / 1000) * 5600;
-  return [bwLat * BWIKI_TO_LL_SCALE_LAT, bwLng * BWIKI_TO_LL_SCALE_LNG];
+  return [-bwLat * BWIKI_SCALE, bwLng * BWIKI_SCALE];
 }
 
 // ================ 初始化 ================
