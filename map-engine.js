@@ -167,7 +167,7 @@ function renderLayerPanel() {
     {id:"pet",imgKey:"fruit"},{id:"boss",imgKey:"battleOpen"},{id:"chest",imgKey:"chestNorm"},
     {id:"gather",imgKey:"gather"},{id:"collect",imgKey:"starBlue"},{id:"npc",imgKey:"shelter"},
     {id:"quest",imgKey:"questTale"},{id:"shop",imgKey:"shop"},{id:"teleport",imgKey:"teleport"},
-    {id:"dungeon",imgKey:"dungeon"},{id:"battle",imgKey:"battleSpy"},{id:"facility",imgKey:"alchemy"}
+    {id:"dungeon",imgKey:"dungeon"},{id:"battle",imgKey:"battleSpy"},{id:"facility",imgKey:"alchemy"},{id:"magicfruit",imgKey:"magicFruit"}
   ];
   html += '<div class="map-layer-grid">';
   filterMeta.forEach(f => {
