@@ -170,8 +170,38 @@ const TYPE_COLORS = {
 // 技能分类图标 (使用BiliWiki游戏内技能图标作为代表)
 const BWIKI_SKILL = 'https://wiki.biligame.com/rocom/Special:FilePath/';
 function skillCatIcon(name, size) {
-  const s = size || 20;
+  const s = size || 18;
   return `<img src="${BWIKI_SKILL}${encodeURIComponent('技能图标_' + name)}.png" style="width:${s}px;height:${s}px;object-fit:contain;border-radius:4px" loading="lazy" onerror="this.style.display='none'">`;
+}
+// 技能图标懒加载：用data-src代替src，IntersectionObserver触发时才加载
+function skillImgLazy(skillName, size) {
+  const s = size || 24;
+  const url = BWIKI_SKILL + encodeURIComponent('技能图标_' + skillName) + '.png';
+  return `<img class="skill-lazy" data-src="${url}" alt="${skillName}" style="width:${s}px;height:${s}px;object-fit:contain;border-radius:4px;background:#f0f0f0" loading="lazy">`;
+}
+// 初始化技能图标懒加载观察器
+let _skillObserver = null;
+function initSkillLazyLoad() {
+  if (_skillObserver) return;
+  _skillObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        if (img.dataset.src) {
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+          img.onerror = function() { this.style.display = 'none'; };
+        }
+        _skillObserver.unobserve(img);
+      }
+    });
+  }, { rootMargin: '100px' });
+}
+function observeSkillIcons() {
+  initSkillLazyLoad();
+  document.querySelectorAll('img.skill-lazy[data-src]').forEach(img => {
+    _skillObserver.observe(img);
+  });
 }
 const SKILL_CAT = {
   "物": {
@@ -801,7 +831,7 @@ function openDexDetail(no) {
     const recCount = groupSkills.filter(s => s.rec).length;
     const gid = `sklGrp_${pet.no}_${groupKey}`;
     const cardsHtml = groupSkills.map(sk => {
-      return `<div class="dex-skill-card"><div class="dex-skill-icon" style="background:${cc.bg}">${skillIconTag(sk.n, 32)}<span class="skill-icon-fallback" style="display:none;width:32px;height:32px;align-items:center;justify-content:center;color:${cc.c}">${cc.svg}</span></div><div class="dex-skill-info"><div class="dex-skill-name">${sk.n}${sk.rec?'<span class="dex-skill-rec">推荐</span>':''}</div><div class="dex-skill-desc">${sk.w>0?'威力 <b>'+sk.w+'</b> | ':''}${sk.c>0?'能耗 '+sk.c+' | ':''}${sk.d||''}</div></div></div>`;
+      return `<div class="dex-skill-card"><div class="dex-skill-icon" style="background:${cc.bg}">${skillImgLazy(sk.n, 24)}<span class="skill-icon-fallback" style="display:none;width:24px;height:24px;align-items:center;justify-content:center;color:${cc.c}">${cc.svg}</span></div><div class="dex-skill-info"><div class="dex-skill-name">${sk.n}${sk.rec?'<span class="dex-skill-rec">推荐</span>':''}</div><div class="dex-skill-desc">${sk.w>0?'威力 <b>'+sk.w+'</b> | ':''}${sk.c>0?'能耗 '+sk.c+' | ':''}${sk.d||''}</div></div></div>`;
     }).join('');
     return `<div class="skill-group">
       <div class="skill-group-header" onclick="toggleSkillGroup('${gid}')">
@@ -923,6 +953,8 @@ function toggleSkillGroup(id) {
     body.style.display = 'block';
     if (arrow) arrow.innerHTML = '&#9650;';
     body.parentElement.classList.add('skill-group-open');
+    // 触发懒加载
+    if (typeof observeSkillIcons === 'function') setTimeout(observeSkillIcons, 50);
   } else {
     body.style.display = 'none';
     if (arrow) arrow.innerHTML = '&#9660;';
@@ -1962,6 +1994,7 @@ function renderSkillDexList() {
   if (search) {
     el.innerHTML = filtered.slice(0, 100).map(entry => renderSkillDexCard(entry)).join('')
       + (filtered.length > 100 ? `<div style="text-align:center;padding:14px;color:#999;font-size:11px;">还有 ${filtered.length - 100} 个技能未显示，请缩小搜索范围</div>` : '');
+    setTimeout(observeSkillIcons, 50);
     return;
   }
   
@@ -2014,6 +2047,7 @@ function renderSkillDexList() {
       </div>
     </div>`;
   }).join('');
+  setTimeout(observeSkillIcons, 50);
 }
 
 function renderSkillDexCard(entry) {
@@ -2024,9 +2058,9 @@ function renderSkillDexCard(entry) {
   const petList = entry.pets.slice(0, 5).join(', ') + (entry.pets.length > 5 ? ` 等${entry.pets.length}只` : '');
   const skillImgUrl = BWIKI_SKILL + encodeURIComponent('技能图标_' + sk.n) + '.png';
   return `<div class="skill-dex-card">
-    <div class="skill-dex-icon" style="background:${cc.bg}"><img src="${skillImgUrl}" style="width:32px;height:32px;object-fit:contain;border-radius:6px" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='${cc.svg.replace(/'/g, "\\'")}'"></div>
+    <div class="skill-dex-icon" style="background:${cc.bg}">${skillImgLazy(sk.n, 24)}</div>
     <div class="skill-dex-info">
-      <div class="skill-dex-name">${sk.n} <span class="skill-dex-type-tag" style="background:${cc.bg};color:${cc.c}">${cc.svg} ${cc.label}</span> <span style="display:inline-flex;align-items:center;gap:1px;padding:1px 4px;border-radius:3px;font-size:9px;background:${attrTc.bg};color:${attrTc.c}">${attrIconTag(skAttr,10)}${skAttr.replace('系','')}</span></div>
+      <div class="skill-dex-name">${sk.n} <span class="skill-dex-type-tag" style="background:${cc.bg};color:${cc.c}">${cc.label}</span> <span style="display:inline-flex;align-items:center;gap:1px;padding:1px 4px;border-radius:3px;font-size:9px;background:${attrTc.bg};color:${attrTc.c}">${attrIconTag(skAttr,10)}${skAttr.replace('系','')}</span></div>
       <div class="skill-dex-meta">${sk.w > 0 ? `<span class="skill-dex-power">威力 ${sk.w}</span>` : ''}${sk.c > 0 ? `<span style="font-size:10px;color:#888">能耗 ${sk.c}</span>` : ''}</div>
       ${sk.d ? `<div class="skill-dex-desc">${sk.d}</div>` : ''}
       <div class="skill-dex-pets">${gIcon('fruit',10)} ${petList}</div>
