@@ -72,7 +72,10 @@ const MAP_ICONS = {
   questTrip:  `${BWIKI_ICON}/9/9a/r0bc4culrfpjxdha9f3ke81sf5y8d1h.png`,
   // 战斗
   battleOpen: `${BWIKI_ICON}/2/20/8bx4ds1o59x3ixcjyxuc68po9aywmd0.png`,
-  battleSpy:  `${BWIKI_ICON}/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png`
+  battleSpy:  `${BWIKI_ICON}/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png`,
+  // 魔力果
+  magicFruit: 'https://wiki.biligame.com/rocom/Special:FilePath/%E5%9C%B0%E5%9B%BE_%E7%82%B9%E4%BD%8D_icon_%E9%AD%94%E5%8A%9B%E6%9E%9C.png',
+  magicFruitItem: 'https://wiki.biligame.com/rocom/Special:FilePath/%E7%89%A9%E5%93%81%E5%9B%BE%E6%A0%87_%E9%AD%94%E5%8A%9B%E6%9E%9C.png'
 };
 
 // 标记类型配置（BiliWiki全类型+游戏内图标）
@@ -89,7 +92,8 @@ const MARKER_CONFIG = {
   dungeon:  {label:"副本",color:"#2c3e50",bg:"#f0f0f0",emoji:"&#9876;",imgUrl:MAP_ICONS.dungeon},
   battle:   {label:"野战",color:"#c0392b",bg:"#fff0ef",emoji:"&#128481;",imgUrl:MAP_ICONS.battleOpen},
   facility: {label:"设施",color:"#7f8c8d",bg:"#ecf0f0",emoji:"&#9881;",imgUrl:MAP_ICONS.alchemy},
-  hidden:   {label:"隐藏",color:"#2c3e50",bg:"#f0f0f0",emoji:"&#128270;",imgUrl:MAP_ICONS.dungeon}
+  hidden:   {label:"隐藏",color:"#2c3e50",bg:"#f0f0f0",emoji:"&#128270;",imgUrl:MAP_ICONS.dungeon},
+  magicfruit:{label:"魔力果",color:"#ff6b35",bg:"#fff3ec",emoji:"&#127818;",imgUrl:MAP_ICONS.magicFruit}
 };
 
 // 标记点数据
@@ -220,6 +224,25 @@ const MAP_MARKERS = [
   {id:"g12",type:"gather",name:"蜂窝",zone:"采邑地",x:208,y:472,icon:"&#128029;",desc:"虫系材料·虫系道具合成"},
   {id:"g13",type:"gather",name:"幽幽草",zone:"望风半岛",x:62,y:290,icon:"&#128123;",desc:"幽系材料·幽系药水合成"},
   {id:"g14",type:"gather",name:"荧光兰",zone:"回填山涧",x:135,y:195,icon:"&#10024;",desc:"稀有花卉·高级炼金材料"},
+
+  // ======= 魔力果树 (17棵，每周刷新，每棵5万经验) =======
+  {id:"mf1",type:"magicfruit",name:"魔力果树①",zone:"港口驻地",x:620,y:680,desc:"悬崖边·需传送至港口驻地NPC处",quest:"每周刷新·5万经验/棵"},
+  {id:"mf2",type:"magicfruit",name:"魔力果树②",zone:"叽叽喳喳台地",x:250,y:90,desc:"悬崖边·庇护所传送后左侧",quest:"每周刷新·5万经验/棵"},
+  {id:"mf3",type:"magicfruit",name:"魔力果树③",zone:"叽叽喳喳台地",x:265,y:100,desc:"丛林中·跳下悬崖寻找",quest:"每周刷新·5万经验/棵"},
+  {id:"mf4",type:"magicfruit",name:"魔力果树④",zone:"岚语峰西侧",x:740,y:108,desc:"西侧山上·靠近精灵踪迹点位",quest:"每周刷新·5万经验/棵"},
+  {id:"mf5",type:"magicfruit",name:"魔力果树⑤",zone:"岚语峰西侧",x:760,y:118,desc:"开阔地带·休憩地和圣羽礼堂之间",quest:"每周刷新·5万经验/棵"},
+  {id:"mf6",type:"magicfruit",name:"魔力果树⑥",zone:"星霜崖地",x:808,y:188,desc:"魔力之源传送点右下方·炼金釜正下方",quest:"每周刷新·5万经验/棵"},
+  {id:"mf7",type:"magicfruit",name:"魔力果树⑦",zone:"圣羽祭台",x:345,y:68,desc:"圣羽礼堂左下方方向",quest:"每周刷新·5万经验/棵"},
+  {id:"mf8",type:"magicfruit",name:"魔力果树⑧",zone:"旧飞艇航道",x:500,y:260,desc:"地图右侧悬崖上·旧飞艇航道魔力之源",quest:"每周刷新·5万经验/棵"},
+  {id:"mf9",type:"magicfruit",name:"魔力果树⑨",zone:"废弃站台",x:580,y:320,desc:"炼金釜右侧",quest:"每周刷新·5万经验/棵"},
+  {id:"mf10",type:"magicfruit",name:"魔力果树⑩",zone:"废弃站台",x:570,y:310,desc:"地图上方位置",quest:"每周刷新·5万经验/棵"},
+  {id:"mf11",type:"magicfruit",name:"魔力果树⑪",zone:"风息山口",x:155,y:305,desc:"炼金台悬崖下",quest:"每周刷新·5万经验/棵"},
+  {id:"mf12",type:"magicfruit",name:"魔力果树⑫",zone:"风息山口",x:170,y:308,desc:"⑪号树继续往右走",quest:"每周刷新·5万经验/棵"},
+  {id:"mf13",type:"magicfruit",name:"魔力果树⑬",zone:"皇家招待所",x:550,y:170,desc:"皇家招待所周边·左下方山上",quest:"每周刷新·5万经验/棵"},
+  {id:"mf14",type:"magicfruit",name:"魔力果树⑭",zone:"皇家招待所",x:560,y:160,desc:"皇家招待所正上方山巅·靠近光王圣所",quest:"每周刷新·5万经验/棵"},
+  {id:"mf15",type:"magicfruit",name:"魔力果树⑮",zone:"皇家招待所",x:545,y:175,desc:"皇家招待所周边第三棵",quest:"每周刷新·5万经验/棵"},
+  {id:"mf16",type:"magicfruit",name:"魔力果树⑯",zone:"国王监狱",x:430,y:500,desc:"监狱上方·炼金炉右上方",quest:"每周刷新·5万经验/棵"},
+  {id:"mf17",type:"magicfruit",name:"魔力果树⑰",zone:"梦兽之森",x:380,y:550,desc:"精灵BOSS身后·附近海边还有一棵",quest:"每周刷新·5万经验/棵"},
 
   // ======= 收集品 =======
   {id:"co1",type:"collect",name:"眠枭之星(蓝)",zone:"风眠圣所",x:670,y:115,icon:"&#11088;",desc:"蓝色眠枭之星·收集品"},
