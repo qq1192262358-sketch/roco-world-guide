@@ -312,8 +312,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft
 .skill-ftag:active { transform:scale(.94); }
 .skill-dex-card { background:#fff; border-radius:10px; padding:10px 12px; margin-bottom:6px; display:flex; align-items:flex-start; gap:10px; cursor:pointer; transition:all .15s; box-shadow:0 1px 4px rgba(0,0,0,.03); }
 .skill-dex-card:active { background:#f0f4ff; }
-.skill-dex-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
-.skill-dex-icon svg { width:22px; height:22px; }
+.skill-dex-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+.skill-dex-icon svg { width:18px; height:18px; }
 .skill-dex-info { flex:1; min-width:0; }
 .skill-dex-name { font-size:13px; font-weight:700; color:#2c3e50; }
 .skill-dex-meta { display:flex; gap:6px; align-items:center; margin-top:2px; flex-wrap:wrap; }
@@ -607,7 +607,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft
 .skill-group-body { padding:0 10px 10px; }
 
 .dex-skill-card { background:#f8f9fa; border-radius:10px; padding:10px 12px; margin-bottom:6px; display:flex; align-items:flex-start; gap:10px; }
-.dex-skill-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+.dex-skill-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
 .dex-skill-icon img { border-radius:6px; }
 .dex-skill-icon svg { width:22px; height:22px; }
 .skill-icon-fallback { border-radius:6px; }
