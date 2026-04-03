@@ -121,6 +121,7 @@ const GAME_ICONS = {
   battleSpy: `${BWIKI}/0/06/rrpkzmmqnqfzcw04uk4cnl3wjk2yvyb.png`,
   // ---- 采集资源 ----
   gather:    `${BWIKI}/f/f8/ifb5jnhil9kfur7px1yftlfah8zhcmt.png`, // 向阳花
+  magicFruit:'https://wiki.biligame.com/rocom/Special:FilePath/%E5%9C%B0%E5%9B%BE_%E7%82%B9%E4%BD%8D_icon_%E9%AD%94%E5%8A%9B%E6%9E%9C.png',
   // ---- 蛋组相关 ----
   eggSky:    `${BWIKI}/8/89/dy3mvf1zwf5gg8l4yud2n115u21e5xt.png`, // 翼系宝箱→天空组
   eggAqua:   `${BWIKI}/e/e7/112od20cucj3uk93kwe6ewmdvm9ljpg.png`, // 水系宝箱→两栖组
