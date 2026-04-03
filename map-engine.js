@@ -28,15 +28,25 @@ const GameTileLayer = L.TileLayer.extend({
   }
 });
 
-// ================ 坐标：直接使用BiliWiki CRS.Simple坐标 ================
-// BiliWiki坐标系：lat(-2100~2100), lng(-3000~2800)，CRS.Simple像素坐标
-// map-data.js中的标记直接用 lat/lng 字段（BiliWiki坐标）
+// ================ 坐标转换：BiliWiki像素坐标 → 标准Leaflet经纬度 ================
+// BiliWiki CRS.Simple 坐标范围: lat(-2100~2100), lng(-3000~2800)
+// 标准Leaflet(Mercator) 在zoom=5时，地图中心附近经纬度线性近似
+// 瓦片在zoom=5覆盖约 lat(-33~33), lng(-34~34)（根据实际测试tile--3到tile2的6个瓦片）
+// 比例: BiliWiki_lat / 2100 ≈ Leaflet_lat / 33 → scale = 33/2100 ≈ 0.0157
+// 但BiliWiki的lat轴是向上为正（y轴翻转），Leaflet的lat也是向上为正 → 不需要翻转
+const BWIKI_TO_LL_SCALE_LAT = 30 / 2100;  // BiliWiki lat → Leaflet lat
+const BWIKI_TO_LL_SCALE_LNG = 34 / 2800;  // BiliWiki lng → Leaflet lng
+
 function markerToLatLng(m) {
-  // 直接使用lat/lng字段（BiliWiki CRS.Simple坐标）
-  if (m.lat !== undefined && m.lng !== undefined) return [m.lat, m.lng];
-  // 兼容旧数据（x,y是Canvas坐标0-1000）- 转换到BiliWiki坐标系
-  // 旧x(0~1000)→lng(-2800~2800), 旧y(0~1000)→lat(2000~-2000)
-  return [2000 - (m.y / 1000) * 4000, -2800 + (m.x / 1000) * 5600];
+  // 优先使用BiliWiki坐标(lat/lng字段)
+  if (m.lat !== undefined && m.lng !== undefined) {
+    return [m.lat * BWIKI_TO_LL_SCALE_LAT, m.lng * BWIKI_TO_LL_SCALE_LNG];
+  }
+  // 兼容旧Canvas坐标(x,y: 0-1000)
+  // 旧坐标映射: x(0~1000)→BiliWiki lng(-2800~2800), y(0~1000)→BiliWiki lat(2100~-2100)
+  const bwLat = 2100 - (m.y / 1000) * 4200;
+  const bwLng = -2800 + (m.x / 1000) * 5600;
+  return [bwLat * BWIKI_TO_LL_SCALE_LAT, bwLng * BWIKI_TO_LL_SCALE_LNG];
 }
 
 // ================ 初始化 ================
@@ -76,7 +86,6 @@ function initLeafletMap() {
   const container = document.getElementById('mapContainer');
   if (!container) return;
   leafletMap = L.map(container, {
-    crs: L.CRS.Simple,
     center: [0, 0], zoom: 5, minZoom: 3, maxZoom: 8,
     zoomControl: false, attributionControl: false,
     zoomSnap: 0.5, zoomDelta: 0.5
